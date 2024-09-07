@@ -1,6 +1,7 @@
 import json
+import threading
 from contextlib import AbstractContextManager
-from typing import Callable, Literal, ParamSpec, Text, TypeVar
+from typing import Callable, Literal, ParamSpec, Set, Text, TypeVar
 
 import awscrt.mqtt
 from awscrt import io, mqtt
@@ -81,6 +82,16 @@ def on_connection_resumed(
     )
 
 
+# Callback when a message is received
+def on_event_received(topic: Text, payload: bytes, **kwargs):
+    print(
+        RichText("Received event from topic '")
+        + RichText(topic, style=Style(color="cyan"))
+        + RichText("': ")
+        + RichText(str(payload), style=Style(color="magenta"))
+    )
+
+
 def get_mqtt_connection(
     endpoint: Text = settings.AWS_IOT_CORE_ENDPOINT,
     *,
@@ -133,6 +144,20 @@ def publish_message(
     )
 
 
+def subscribe(
+    mqtt_connection: "awscrt.mqtt.Connection",
+    topic: Text,
+    callback: Callable[..., R] = on_event_received,
+) -> None:
+    # Subscribe
+    print(f"Subscribing to topic '{topic}' ...")
+    subscribe_future, packet_id = mqtt_connection.subscribe(
+        topic=topic, qos=mqtt.QoS.AT_LEAST_ONCE, callback=callback
+    )
+    subscribe_result = subscribe_future.result()
+    print(f"Subscribed with {str(subscribe_result['qos'])}")
+
+
 def disconnect(mqtt_connection: "awscrt.mqtt.Connection"):
     # Disconnect
     print("Disconnecting...")
@@ -155,4 +180,39 @@ class MQTTConnectionManager(AbstractContextManager):
 
     def __exit__(self, exc_type, exc_value, traceback):
         # Disconnect the MQTT connection when exiting the context
+        disconnect(self._connection)
+
+
+class SubscriptionManager:
+    def __init__(
+        self,
+        connection_builder: Callable[
+            ..., "awscrt.mqtt.Connection"
+        ] = get_mqtt_connection,
+    ):
+        self._connection = connection_builder()
+        self._subscriptions: Set[Text] = set()
+        self._received_all_events = threading.Event()
+
+    @property
+    def connection(self) -> "awscrt.mqtt.Connection":
+        return self._connection
+
+    def add_subscription(self, topic: Text, callback: Callable[..., R]):
+        subscribe(self._connection, topic, callback)
+        self._subscriptions.add(topic)
+
+    def remove_subscription(self, topic: Text):
+        self._connection.unsubscribe(topic)
+        self._subscriptions.remove(topic)
+
+    def wait_for_all_events(self):
+        self._received_all_events.wait()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        for topic in tuple(self._subscriptions):
+            self.remove_subscription(topic)
         disconnect(self._connection)
