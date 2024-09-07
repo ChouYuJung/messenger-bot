@@ -1,5 +1,6 @@
 from typing import Text
 
+from faker import Faker
 from ksuid import Ksuid
 from pydantic import Field
 from pydantic_settings import BaseSettings
@@ -8,6 +9,8 @@ from rich.console import Console
 from .version import VERSION
 
 console = Console()
+
+fake = Faker()
 
 
 class ApplicationSettings(BaseSettings):
@@ -20,7 +23,7 @@ class SecretsSettings(BaseSettings):
     AWS_IOT_CORE_CLIENT_ID_BASE: Text | None = Field(default=None)
     AWS_IOT_CORE_CLIENT_ID: Text = Field(default="")
     AWS_IOT_CORE_SECRET_KEY_FILEPATH: Text = Field(...)
-    AWS_IOT_CORE_CERTIFICATES_FILEPATH: Text = Field(...)
+    AWS_IOT_CORE_CERTS_FILEPATH: Text = Field(...)
     AWS_IOT_CORE_CA_FILEPATH: Text = Field(...)
 
 

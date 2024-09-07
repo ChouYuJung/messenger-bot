@@ -1,6 +1,6 @@
 import json
 from contextlib import AbstractContextManager
-from typing import Literal, Text
+from typing import Callable, Literal, ParamSpec, Text, TypeVar
 
 import awscrt.mqtt
 from awscrt import io, mqtt
@@ -11,13 +11,17 @@ from rich.text import Text as RichText
 
 from msg_bot.config import settings
 
+T = TypeVar("T")
+P = ParamSpec("P")
+R = TypeVar("R")
+
 
 def get_topic(
     topic_type: Literal["root", "org", "conv", "msg"],
     operation: Literal[
         "create", "update", "delete", "bulk_create", "bulk_update", "bulk_delete"
     ],
-    field: Text | None,
+    field: Text | None = None,
     *,
     org_id: Text | None = None,
     conv_id: Text | None = None,
@@ -80,7 +84,7 @@ def on_connection_resumed(
 def get_mqtt_connection(
     endpoint: Text = settings.AWS_IOT_CORE_ENDPOINT,
     *,
-    cert_filepath: Text = settings.AWS_IOT_CORE_CERTIFICATES_FILEPATH,
+    cert_filepath: Text = settings.AWS_IOT_CORE_CERTS_FILEPATH,
     pri_key_filepath: Text = settings.AWS_IOT_CORE_SECRET_KEY_FILEPATH,
     ca_filepath: Text = settings.AWS_IOT_CORE_CA_FILEPATH,
     client_id: Text = settings.AWS_IOT_CORE_CLIENT_ID,
@@ -138,8 +142,13 @@ def disconnect(mqtt_connection: "awscrt.mqtt.Connection"):
 
 
 class MQTTConnectionManager(AbstractContextManager):
-    def __init__(self, connection: "awscrt.mqtt.Connection | None" = None):
-        self._connection = get_mqtt_connection() if connection is None else connection
+    def __init__(
+        self,
+        connection_builder: Callable[
+            ..., "awscrt.mqtt.Connection"
+        ] = get_mqtt_connection,
+    ):
+        self._connection = connection_builder()
 
     def __enter__(self):
         return self._connection
