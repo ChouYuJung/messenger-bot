@@ -9,6 +9,7 @@ version = "0.1.0"
 [tool.poetry.dependencies]
 awsiotsdk = "*"
 celery = "*"
+click = "*"
 pydantic = { extras = ["email"], version = "*" }
 pydantic-settings = "*"
 python = "^3.12"
@@ -31,6 +32,9 @@ isort = "*"
 poetry-plugin-export = "*"
 pytest = "*"
 pytest-asyncio = "*"
+
+[tool.poetry.scripts]
+msgbot = "msg_bot.main:msgbot"
 
 [tool.isort]
 profile = "black"
