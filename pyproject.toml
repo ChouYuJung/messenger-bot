@@ -1,0 +1,42 @@
+[tool.poetry]
+authors = ["Allen Chou <f1470891079@gmail.com>"]
+description = ""
+license = "Apache-2.0 license"
+name = "msg-bot"
+readme = "README.md"
+version = "0.1.0"
+
+[tool.poetry.dependencies]
+awsiotsdk = "*"
+celery = "*"
+pydantic = { extras = ["email"], version = "*" }
+pydantic-settings = "*"
+python = "^3.12"
+python-dateutil = "*"
+pytz = "*"
+redis = "*"
+rich = "*"
+uuid-utils = "*"
+yarl = "*"
+
+[tool.poetry.extras]
+all = []
+
+[tool.poetry.group.dev.dependencies]
+black = "*"
+faker = "*"
+isort = "*"
+poetry-plugin-export = "*"
+pytest = "*"
+pytest-asyncio = "*"
+
+[tool.isort]
+profile = "black"
+
+[tool.flake8]
+ignore = ["E203", "E704", "W503"]
+max-line-length = 88
+
+[build-system]
+build-backend = "poetry.core.masonry.api"
+requires = ["poetry-core"]
