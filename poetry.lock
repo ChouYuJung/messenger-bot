@@ -1503,6 +1503,16 @@ docs = ["sphinx (>=5.3)", "sphinx-rtd-theme (>=1.0)"]
 testing = ["coverage (>=6.2)", "hypothesis (>=5.7.1)"]
 
 [[package]]
+name = "python-baseconv"
+version = "1.2.2"
+description = "Convert numbers from base 10 integers to base X strings and back again."
+optional = false
+python-versions = "*"
+files = [
+    {file = "python-baseconv-1.2.2.tar.gz", hash = "sha256:0539f8bd0464013b05ad62e0a1673f0ac9086c76b43ebf9f833053527cd9931b"},
+]
+
+[[package]]
 name = "python-dateutil"
 version = "2.9.0.post0"
 description = "Extensions to the standard Python datetime module"
@@ -1776,6 +1786,19 @@ files = [
     {file = "six-1.16.0-py2.py3-none-any.whl", hash = "sha256:8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254"},
     {file = "six-1.16.0.tar.gz", hash = "sha256:1e61c37477a1626458e36f7b1d82aa5c9b094fa4802892072e49de9c60c4c926"},
 ]
+
+[[package]]
+name = "svix-ksuid"
+version = "0.6.2"
+description = "A pure-Python KSUID implementation"
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "svix-ksuid-0.6.2.tar.gz", hash = "sha256:beb95bd6284bdbd526834e233846653d2bd26eb162b3233513d8f2c853c78964"},
+]
+
+[package.dependencies]
+python-baseconv = "*"
 
 [[package]]
 name = "tomlkit"
@@ -2149,4 +2172,4 @@ all = []
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "99ae8683f027f9576a9457aea89aabc7dcbfe3c4040ba248b9aa516510ee142f"
+content-hash = "e97dddb13757de863033dddf5aa1ab5a1cf966ceade7006454499cb6a27807b0"

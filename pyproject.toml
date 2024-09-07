@@ -13,9 +13,11 @@ pydantic = { extras = ["email"], version = "*" }
 pydantic-settings = "*"
 python = "^3.12"
 python-dateutil = "*"
+python-dotenv = "*"
 pytz = "*"
 redis = "*"
 rich = "*"
+svix-ksuid = "*"
 uuid-utils = "*"
 yarl = "*"
 
