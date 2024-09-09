@@ -1,4 +1,3 @@
-import json
 import threading
 from contextlib import AbstractContextManager
 from typing import Callable, Literal, ParamSpec, Set, Text, TypeVar
@@ -124,24 +123,6 @@ def get_mqtt_connection(
     print("Connected!")
 
     return mqtt_connection
-
-
-def publish_message(
-    mqtt_connection: "awscrt.mqtt.Connection", topic: Text, message: Text
-):
-    # Publish message to server desired number of times.
-    rich_text = (
-        RichText("Publishing message to topic '")
-        + RichText(topic, style=Style(color="cyan"))
-        + RichText("': ")
-        + RichText(message, style=Style(color="green"))
-    )
-    print(rich_text)
-    mqtt_connection.publish(
-        topic=topic,
-        payload=json.dumps({"message": message}),
-        qos=mqtt.QoS.AT_LEAST_ONCE,
-    )
 
 
 def subscribe(

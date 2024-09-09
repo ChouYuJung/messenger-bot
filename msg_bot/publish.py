@@ -1,27 +1,27 @@
-import time
+from typing import Text
 
-from ksuid import Ksuid
+import awscrt.mqtt
+from awscrt import mqtt
+from rich.style import Style
+from rich.text import Text as RichText
 
-from msg_bot.config import fake
-from msg_bot.utils.pubsub import MQTTConnectionManager, get_topic, publish_message
-
-
-def main():
-    with MQTTConnectionManager() as mqtt_connection:
-        for _ in range(3):
-            publish_message(
-                mqtt_connection,
-                get_topic(
-                    "msg",
-                    "create",
-                    org_id=f"org_{Ksuid()}",
-                    conv_id=f"conv_{Ksuid()}",
-                    msg_id=f"msg_{Ksuid()}",
-                ),
-                fake.text(),
-            )
-            time.sleep(1)
+from msg_bot.config import console
+from msg_bot.schemas.messages import Message
 
 
-if __name__ == "__main__":
-    main()
+def publish_message(
+    mqtt_connection: "awscrt.mqtt.Connection", topic: Text, message: "Message"
+):
+    # Publish message to server desired number of times.
+    rich_text = (
+        RichText("Publishing message to topic '")
+        + RichText(topic, style=Style(color="cyan"))
+        + RichText("': ")
+        + RichText(message.content, style=Style(color="green"))
+    )
+    console.print(rich_text)
+    mqtt_connection.publish(
+        topic=topic,
+        payload=message.model_dump_json().encode("utf-8"),
+        qos=mqtt.QoS.AT_LEAST_ONCE,
+    )
